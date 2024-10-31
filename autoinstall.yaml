@@ -1,0 +1,74 @@
+#cloud-config
+autoinstall:
+  version: 1
+  identity:
+    hostname: albtraeume
+    username: traum
+    # No password or SSH key; you’ll set this up post-installation
+
+  user-data:
+    packages:
+      - neovim
+      - neofetch
+      - git
+      - rustc
+      - wezterm
+      - fish
+      - unzip
+
+    runcmd:
+      # Update and upgrade the system
+      - apt update -y
+      - apt upgrade -y
+      - chsh -s /usr/bin/fish traum
+
+      # Uninstall unwanted applications
+      - apt remove --purge thunderbird -y
+      - apt remove --purge rhythmbox -y
+      - apt remove --purge gnome-terminal -y
+      - apt autoremove -y  # Clean up any unnecessary packages
+
+      # Install additional dependencies
+      - apt install -y curl wget build-essential
+
+      # Create font directory if it doesn't exist
+      - mkdir -p /usr/local/share/fonts
+
+      # Download and install a Nerd Font (e.g., FiraCode)
+      - curl -LO https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/FiraCode.zip
+      - unzip FiraCode.zip -d /usr/local/share/fonts/
+      - fc-cache -fv  # Refresh font cache
+      - rm FiraCode.zip  # Clean up zip file
+
+  # Custom configurations
+  write_files:
+    - path: /etc/neofetch/config.conf
+      content: |
+        print_info() {
+            info title
+            info underline
+            info "OS" distro
+            info "Kernel" kernel
+            info "Uptime" uptime
+        }
+
+    - path: /home/traum/.config/wezterm/wezterm.lua
+      content: |
+        local wezterm = require 'wezterm'
+
+        return {
+          font = wezterm.font("FiraCode Nerd Font"),
+          font_size = 14.0,
+          color_scheme = "Gruvbox Dark",
+          window_background_opacity = 1.0,
+          enable_tab_bar = false,
+          window_padding = {
+            left = 4,
+            right = 4,
+            top = 1,
+            bottom = 1,
+          },
+          audible_bell = "Disabled",
+          default_prog = {"/usr/bin/fish", "-l"},
+          enable_wayland = false,
+        }
