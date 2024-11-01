@@ -2,9 +2,9 @@
 autoinstall:
   version: 1
   identity:
-    hostname: albtraeume
+    hostname: ubuntu
     username: traum
-    # No password or SSH key; you’ll set this up post-installation
+    password: "*"  # Use a placeholder to disable password login
 
   user-data:
     packages:
