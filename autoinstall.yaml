@@ -8,9 +8,8 @@ autoinstall:
   identity:
     hostname: ubuntu
     username: traum
-    password: "*"
+    password: "*"  # Placeholder to disable password login
 
-  
   packages:
     - neovim
     - neofetch
@@ -20,39 +19,34 @@ autoinstall:
     - fish
     - python3-pip
     - unzip
-    - remove:
-        - gnome-terminal
-  
 
   runcmd:
-      # Updating and upgrading the system
-    - apt update 
-    - apt upgrade
+    # Updating and upgrading the system
+    - apt update -y
+    - apt upgrade -y
     - chsh -s /usr/bin/fish traum
 
-      # Uninstalling unwanted applications
-    - apt remove --purge thunderbird 
-    - apt remove --purge rhythmbox   
-    - apt remove --purge gnome-terminal 
-    - apt autoremove
+    # Uninstalling unwanted applications
+    - apt remove --purge thunderbird -y
+    - apt remove --purge rhythmbox -y
+    - apt remove --purge gnome-terminal -y
+    - apt autoremove -y
 
-      # Install additional dependencies
-    - apt install curl wget build-essential
+    # Install additional dependencies
+    - apt install -y curl wget build-essential
 
-      # Create font directory if it doesn't exist
+    # Create font directory if it doesn't exist
     - mkdir -p /usr/local/share/fonts
 
-      # Download and install a Nerd Font (e.g., FiraCode)
+    # Download and install a Nerd Font (e.g., FiraCode)
     - curl -LO https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/FiraCode.zip
     - unzip FiraCode.zip -d /usr/local/share/fonts/
     - fc-cache -fv  # Refresh font cache
     - rm FiraCode.zip  # Clean up zip file
 
-    # Late system configurations
   late-commands:
     - curtin in-target --target=/target -- update-alternatives --set x-terminal-emulator /usr/bin/wezterm
-    
-    # Custom configuration files
+
   write_files:
     - path: /etc/neofetch/config.conf
       content: |
