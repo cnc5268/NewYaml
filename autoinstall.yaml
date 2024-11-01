@@ -1,46 +1,58 @@
 #cloud-config
 autoinstall:
   version: 1
+
+  source:
+    id: ubuntu-desktop-minimal
+    
   identity:
     hostname: ubuntu
     username: traum
-    password: "*"  # Use a placeholder to disable password login
+    password: "*"
 
-  user-data:
-    packages:
-      - neovim
-      - neofetch
-      - git
-      - rustc
-      - wezterm
-      - fish
-      - unzip
+  
+  packages:
+    - neovim
+    - neofetch
+    - git
+    - rustc
+    - wezterm
+    - fish
+    - python3-pip
+    - unzip
+    - remove:
+        - gnome-terminal
+  
 
-    runcmd:
-      # Update and upgrade the system
-      - apt update -y
-      - apt upgrade -y
-      - chsh -s /usr/bin/fish traum
+  runcmd:
+      # Updating and upgrading the system
+    - apt update 
+    - apt upgrade
+    - chsh -s /usr/bin/fish traum
 
-      # Uninstall unwanted applications
-      - apt remove --purge thunderbird -y
-      - apt remove --purge rhythmbox -y
-      - apt remove --purge gnome-terminal -y
-      - apt autoremove -y  # Clean up any unnecessary packages
+      # Uninstalling unwanted applications
+    - apt remove --purge thunderbird 
+    - apt remove --purge rhythmbox   
+    - apt remove --purge gnome-terminal 
+    - apt autoremove
 
       # Install additional dependencies
-      - apt install -y curl wget build-essential
+    - apt install curl wget build-essential
 
       # Create font directory if it doesn't exist
-      - mkdir -p /usr/local/share/fonts
+    - mkdir -p /usr/local/share/fonts
 
       # Download and install a Nerd Font (e.g., FiraCode)
-      - curl -LO https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/FiraCode.zip
-      - unzip FiraCode.zip -d /usr/local/share/fonts/
-      - fc-cache -fv  # Refresh font cache
-      - rm FiraCode.zip  # Clean up zip file
+    - curl -LO https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/FiraCode.zip
+    - unzip FiraCode.zip -d /usr/local/share/fonts/
+    - fc-cache -fv  # Refresh font cache
+    - rm FiraCode.zip  # Clean up zip file
 
-  # Custom configurations
+    # Late system configurations
+  late-commands:
+    - curtin in-target --target=/target -- update-alternatives --set x-terminal-emulator /usr/bin/wezterm
+    
+    # Custom configuration files
   write_files:
     - path: /etc/neofetch/config.conf
       content: |
